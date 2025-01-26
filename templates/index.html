@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Record Collection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="{{ url_for('index') }}">Home</a>
+            {% if role == 'admin' %}
+                <a href="{{ url_for('add_record') }}">Add New Record</a>
+            {% endif %}
+        </div>
+        <div>
+            <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+            <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        </div>
+    </div>
+
+    <h1>Record Collection</h1>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search by band name or title...">
+    </div>
+
+    <div class="sort-toggle">
+        Sort by Band Name:
+        {% if sort_order == 'asc' %}
+            <a href="{{ url_for('index', sort='desc') }}">Z to A</a>
+        {% else %}
+            <a href="{{ url_for('index', sort='asc') }}">A to Z</a>
+        {% endif %}
+    </div>
+
+    <table id="records-table">
+        <tr>
+            <th>Band Name</th>
+            <th>Title</th>
+            <th>Year</th>
+            <th>Format</th>
+            {% if role == 'admin' %}
+                <th>Actions</th>
+            {% endif %}
+        </tr>
+        {% for record in records %}
+        <tr class="record-row">
+            <td class="band-name">{{ record.band_name }}</td>
+            <td class="title">{{ record.title }}</td>
+            <td>{{ record.year }}</td>
+            <td>{{ record.format }}</td>
+            {% if role == 'admin' %}
+                <td class="actions">
+                    <a href="{{ url_for('edit_record', id=record.id) }}">Edit</a>
+                    <a href="{{ url_for('delete_record', id=record.id) }}">Delete</a>
+                </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Link to the JavaScript file -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
