@@ -3,49 +3,38 @@ This is a simple web application built using Flask and SQLite to manage a record
 
 ## Features
 1. User Authentication
-Admin User: Can add, edit, and delete records.
-
-Read-Only User: Can only view records (actions are hidden).
-
-Secure login with session management.
+* Admin User: Can add, edit, and delete records.
+* Read-Only User: Can only view records (actions are hidden).
+* Secure login with session management.
 
 2. ### Record Management
-Add Records: Add new records with band name, title, year, and format.
-
-Edit Records: Update existing records.
-
-Delete Records: Remove records from the collection.
-
-View Records: Display all records in a table.
+* Add Records: Add new records with band name, title, year, and format.
+* Edit Records: Update existing records.
+* Delete Records: Remove records from the collection.
+* View Records: Display all records in a table.
 
 3. ### Search Filter
-Search records by band name or title in real-time.
+* Search records by band name or title in real-time.
 
 4. ### Sorting
-Sort records alphabetically by band name (A to Z or Z to A).
+* Sort records alphabetically by band name (A to Z or Z to A).
 
 5. ### Dark Mode
-Toggle between light and dark themes.
-
-Theme preference is saved in local storage.
+* Toggle between light and dark themes.
+* Theme preference is saved in local storage.
 
 6. ### Change Password
-Users can change their password securely.
-
-Passwords are hashed before being stored in the database.
+* Users can change their password securely.
+* Passwords are hashed before being stored in the database.
 
 7. ### Responsive Design
-Clean and modern UI with CSS styling.
+* Clean and modern UI with CSS styling.
 
 ## Technologies Used
 * Backend: Flask (Python)
-
 * Database: SQLite
-
 * Frontend: HTML, CSS, JavaScript
-
 * Styling: Custom CSS with dark mode support
-
 * JavaScript: For dynamic features like search filtering and theme toggling
 
 ## Project structure
