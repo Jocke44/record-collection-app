@@ -45,20 +45,20 @@ This is a simple web application built using **Flask** and **SQLite** to manage 
 ## Project Structure
 
 record_collection_app/
-│
-├── app.py # Main Flask application
-├── database.db # SQLite database file
-├── README.md # Project documentation
-│
-├── static/
-│ ├── styles.css # CSS for styling
-│ └── script.js # JavaScript for dynamic features
-│
-└── templates/
-├── index.html # Main page (record collection)
-├── login.html # Login page
-├── add.html # Add a new record
-└── edit.html # Edit a record
+* │
+* ├── app.py # Main Flask application
+* ├── database.db # SQLite database file
+* ├── README.md # Project documentation
+* │
+* ├── static/
+* │ ├── styles.css # CSS for styling
+* │ └── script.js # JavaScript for dynamic features
+* │
+* └── templates/
+* | ├── index.html # Main page (record collection)
+* | ├── login.html # Login page
+* | ├── add.html # Add a new record
+* | └── edit.html # Edit a record
 
 
 ---
@@ -107,4 +107,4 @@ record_collection_app/
 * Add more search filters (e.g., by year or format).
 
 ## License
-This project is open-source and available under the MIT License.
+This project is open-source and available under the MIT License..-
