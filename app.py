@@ -63,13 +63,52 @@ def login():
             flash('Invalid credentials')
     return render_template('login.html')
 
+# Logout Route
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    session.pop('role', None)
+    return redirect(url_for('login'))
+
+# Change Password Route
+@app.route('/change-password', methods=['GET', 'POST'])
+def change_password():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        # Fetch the current user
+        user = User.query.filter_by(username=session['username']).first()
+
+        # Verify the current password
+        if not check_password_hash(user.password, current_password):
+            flash('Current password is incorrect')
+            return redirect(url_for('change_password'))
+
+        # Check if new passwords match
+        if new_password != confirm_password:
+            flash('New passwords do not match')
+            return redirect(url_for('change_password'))
+
+        # Update the password
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+
+        flash('Password updated successfully')
+        return redirect(url_for('index'))
+
+    return render_template('change_password.html')
+
 # Index Route (Main Page)
 @app.route('/')
 def index():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    
-    # Sort records by band_name A to Z
     records = Record.query.order_by(Record.band_name.asc()).all()
     return render_template('index.html', records=records, role=session.get('role'))
 
@@ -113,12 +152,6 @@ def delete_record(id):
     db.session.delete(record)
     db.session.commit()
     return redirect(url_for('index'))
-
-# Logout Route
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)  # Clear the session
-    return redirect(url_for('login'))  # Redirect to the login page
 
 # Run the application
 if __name__ == '__main__':
