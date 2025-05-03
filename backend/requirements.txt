@@ -1,5 +1,11 @@
-
 fastapi
-uvicorn
+uvicorn[standard]
 sqlmodel
+python-dotenv
+passlib[bcrypt]
+python-jose
 requests
+httpx
+email-validator
+pydantic
+psycopg2-binary
