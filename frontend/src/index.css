@@ -1,0 +1,27 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  @apply bg-white text-black dark:bg-zinc-900 dark:text-white;
+}
+
+body {
+  @apply bg-inherit text-inherit;
+}
+.spinner {
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-right: 2px solid white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.5s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
