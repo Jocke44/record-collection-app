@@ -1,58 +1,80 @@
 // src/lib/api.js
-
 import axios from "axios";
+import { toast } from "sonner";
 
-// ✅ Base URL (change to your live backend URL)
+// 🌎 Change this to your live backend URL
 const BASE_URL = "https://record-backend.onrender.com";
 
-// REGISTER
-export const registerUser = (email, password) => {
-  return axios.post(`${BASE_URL}/register`, { email, password });
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000, // ⏱️ optional timeout
+});
+
+const handleError = (error) => {
+  if (error.response) {
+    console.error("API Error:", error.response.data);
+    toast.error(error.response.data.detail || "Something went wrong.");
+  } else if (error.request) {
+    console.error("API Error: No response received.", error.request);
+    toast.error("No response from server.");
+  } else {
+    console.error("API Error:", error.message);
+    toast.error("Error: " + error.message);
+  }
+  throw error;
 };
 
-// LOGIN
-export const loginUser = (email, password) => {
-  return axios.post(`${BASE_URL}/login`, { email, password });
+export const registerUser = async (email, password) => {
+  try {
+    return await api.post("/register", { email, password });
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// REQUEST PASSWORD RESET
-export const requestPasswordReset = (email) => {
-  return axios.post(`${BASE_URL}/request-password-reset`, null, {
-    params: { email },
-  });
+export const loginUser = async (email, password) => {
+  try {
+    return await api.post("/login", { email, password });
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// CONFIRM PASSWORD RESET
-export const confirmPasswordReset = (token, newPassword) => {
-  return axios.post(`${BASE_URL}/reset-password/confirm`, {
-    token,
-    new_password: newPassword,
-  });
+export const requestPasswordReset = async (email) => {
+  try {
+    return await api.post("/request-password-reset", { email });
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// FETCH RECORDS
-export const fetchRecords = () => {
-  return axios.get(`${BASE_URL}/records`);
+export const confirmPasswordReset = async (token, newPassword) => {
+  try {
+    return await api.post("/reset-password/confirm", {
+      token,
+      new_password: newPassword,
+    });
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// ADD RECORD
-export const addRecord = (record) => {
-  return axios.post(`${BASE_URL}/records`, record);
+export const searchDiscogs = async (query) => {
+  try {
+    const res = await api.get(`/discogs/search?q=${encodeURIComponent(query)}`);
+    return res.data;
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// DELETE RECORD
-export const deleteRecord = (id) => {
-  return axios.delete(`${BASE_URL}/records/${id}`);
+export const addRecord = async (recordData) => {
+  try {
+    return await api.post("/records", recordData);
+  } catch (err) {
+    handleError(err);
+  }
 };
 
-// UPDATE RECORD
-export const updateRecord = (id, updatedData) => {
-  return axios.put(`${BASE_URL}/records/${id}`, updatedData);
-};
+// ✅ Add more endpoints as needed (export const xyz...)
 
-// BARCODE LOOKUP
-export const lookupBarcode = (barcode) => {
-  return axios.get(`${BASE_URL}/discogs/search`, {
-    params: { barcode },
-  });
-};

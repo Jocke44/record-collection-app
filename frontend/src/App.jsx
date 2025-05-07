@@ -11,7 +11,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
 import { ProtectedRoute } from "@/lib/ProtectedRoute";
-import RequestPasswordReset from "@/pages/RequestPasswordReset";
+import ResetPasswordRequest from "./pages/ResetPasswordRequest";
 
 
 
@@ -93,7 +93,7 @@ function MainLayout({ theme, setTheme }) {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/request-password-reset" element={<RequestPasswordReset />} />
+        <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
       </Routes>
     </div>
   );
