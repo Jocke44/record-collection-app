@@ -1,4 +1,5 @@
 # backend/main.py
+print("🔥 Running main.py from backend")
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
