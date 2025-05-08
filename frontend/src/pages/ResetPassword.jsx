@@ -53,6 +53,7 @@ export default function ResetPassword() {
             onChange={(e) => setToken(e.target.value)}
             className="w-full border p-2 rounded bg-white text-black dark:bg-zinc-800 dark:text-white"
             required
+            disabled={!!location.state?.token}
           />
           <input
             type="password"

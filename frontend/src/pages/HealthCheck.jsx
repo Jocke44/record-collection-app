@@ -1,11 +1,13 @@
+// src/pages/HealthCheck.jsx
 import { useEffect } from "react";
+import { getRecords } from "@/lib/api";
 
 export default function HealthCheck() {
   useEffect(() => {
-    fetch("http://localhost:8000/records")
-      .then((r) => {
+    getRecords()
+      .then(() => {
         const el = document.getElementById("api-status");
-        if (el) el.textContent = r.ok ? "✅ OK" : "❌ Fail";
+        if (el) el.textContent = "✅ OK";
       })
       .catch(() => {
         const el = document.getElementById("api-status");
@@ -20,3 +22,4 @@ export default function HealthCheck() {
     </div>
   );
 }
+

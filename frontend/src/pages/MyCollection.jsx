@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { toast } from "sonner";
 import { Undo2 } from "lucide-react";
 import { exportToCSV, downloadDatabase } from "@/lib/exportHelpers";
-
+import { 
+  getRecords, 
+  deleteRecordById, 
+  addRecord, 
+  updateRecord, 
+  searchDiscogsByBarcode 
+} from "@/lib/api";
 
 export default function MyCollection() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,8 +35,8 @@ export default function MyCollection() {
   });
 
   const loadRecords = async () => {
-    const res = await axios.get("http://localhost:8000/records");
-    setRecords(res.data);
+    const res = await getRecords();
+    setRecords(res);
   };
 
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function MyCollection() {
   const deleteRecord = async (id) => {
     const record = records.find((r) => r.id === id);
     setLastDeleted(record);
-    await axios.delete(`http://localhost:8000/records/${id}`);
+    await deleteRecordById(id);
     setSelected(null);
     loadRecords();
     toast.success("Record deleted", {
@@ -68,14 +73,14 @@ export default function MyCollection() {
   };
 
   const addToCollection = async (item) => {
-    await axios.post("http://localhost:8000/records", item);
+    await addRecord(item);
     loadRecords();
     toast.success("Record re-added!");
   };
 
   const updateNotes = async () => {
     const updated = { ...selected, notes };
-    await axios.put(`http://localhost:8000/records/${selected.id}`, updated);
+    await updateRecord(selected.id, updated);
     setSelected(null);
     loadRecords();
     toast.success("Notes updated!");
@@ -83,7 +88,7 @@ export default function MyCollection() {
 
   const handleAddRecord = async () => {
     try {
-      await axios.post("http://localhost:8000/records", {
+      await addRecord({
         ...newRecord,
         year: parseInt(newRecord.year) || 0, // Make sure year is integer
       });
@@ -97,35 +102,35 @@ export default function MyCollection() {
   };
 
   const handleBarcodeInput = async (e) => {
-  const barcode = e.target.value;
-  setNewRecord({ ...newRecord, barcode });
+    const barcode = e.target.value;
+    setNewRecord({ ...newRecord, barcode });
 
-  if (barcode.length < 5) return; // skip short inputs
+    if (barcode.length < 5) return; // skip short inputs
 
-  try {
-    const res = await axios.get(`http://localhost:8000/discogs/search?barcode=${barcode}`);
-    if (res.data.length > 0) {
-      const item = res.data[0];
-      setNewRecord({
-        ...newRecord,
-        barcode,
-        title: item.title || "",
-        artist: item.artist || "",
-        year: item.year || 0,
-        genre: item.genre || "",
-        format: item.format || "",
-        label: item.label || "",
-        cover_url: item.cover_url || "",
-      });
-      toast.success("Barcode found and fields auto-filled!");
-    } else {
-      toast.warning("No matching record found for barcode.");
+    try {
+      const data = await searchDiscogsByBarcode(barcode);
+      if (data.length > 0) {
+        const item = data[0];
+        setNewRecord({
+          ...newRecord,
+          barcode,
+          title: item.title || "",
+          artist: item.artist || "",
+          year: item.year || 0,
+          genre: item.genre || "",
+          format: item.format || "",
+          label: item.label || "",
+          cover_url: item.cover_url || "",
+        });
+        toast.success("Barcode found and fields auto-filled!");
+      } else {
+        toast.warning("No matching record found for barcode.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Barcode lookup failed.");
     }
-  } catch (error) {
-    console.error(error);
-    toast.error("Barcode lookup failed.");
-  }
-};
+  };
 
    return (
     <div className="grid gap-6">

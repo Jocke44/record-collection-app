@@ -76,5 +76,42 @@ export const addRecord = async (recordData) => {
   }
 };
 
+export const getRecords = async () => {
+  try {
+    const res = await api.get("/records");
+    return res.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const deleteRecordById = async (id) => {
+  try {
+    return await api.delete(`/records/${id}`);
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const updateRecord = async (id, updated) => {
+  try {
+    return await api.put(`/records/${id}`, updated);
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const searchDiscogsByBarcode = async (barcode) => {
+  try {
+    const res = await api.get(`/discogs/search?barcode=${encodeURIComponent(barcode)}`);
+    return res.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+
+
+
 // ✅ Add more endpoints as needed (export const xyz...)
 

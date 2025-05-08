@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import { requestPasswordReset } from "@/lib/api";
 
 export default function ResetPasswordRequest() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.email || "");
   const [loading, setLoading] = useState(false);
   const emailRef = useRef();
+  
 
   useEffect(() => {
     emailRef.current?.focus();
@@ -19,7 +21,7 @@ export default function ResetPasswordRequest() {
     try {
       const res = await requestPasswordReset(email);
       toast.success("Reset token sent (check console/log)");
-      console.log("Reset token:", res.data.token); // TODO: Remove in production
+      
     } catch (err) {
       toast.error("Failed to send reset request");
     } finally {
