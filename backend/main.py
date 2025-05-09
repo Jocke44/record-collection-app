@@ -10,7 +10,6 @@ from models.record import Record
 from dotenv import load_dotenv
 from typing import List
 from sqlmodel import Session, select
-from models.reset_token import ResetToken
 import os
 import requests
 
@@ -26,12 +25,10 @@ app.add_middleware(
         "http://localhost:5173",
         "https://record-frontend.onrender.com"
     ],
-    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
-    
+    allow_credentials=False,
 )
-
 
 # --- Routers ---
 app.include_router(auth.router)
@@ -111,7 +108,9 @@ def search_discogs(q: str = None, barcode: str = None):
 def health():
     return {"status": "ok", "message": "Backend is healthy"}
 
+# ✅ Patch: handle both GET + HEAD to keep Render happy
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"message": "Record Collection Backend is live"}
+
 
