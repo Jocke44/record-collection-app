@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000";
+const API_URL = "https://record-backend.onrender.com";
 
 const AuthContext = createContext();
 
