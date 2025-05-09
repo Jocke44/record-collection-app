@@ -111,6 +111,7 @@ def search_discogs(q: str = None, barcode: str = None):
 def health():
     return {"status": "ok", "message": "Backend is healthy"}
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"message": "Record Collection Backend is live"}
+
