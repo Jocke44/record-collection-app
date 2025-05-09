@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 // 🌎 Change this to your live backend URL
-const BASE_URL = "https://record-backend.onrender.com";
+const BASE_URL = "https://record-backend-a5nk.onrender.com";
 
 const api = axios.create({
   baseURL: BASE_URL,
