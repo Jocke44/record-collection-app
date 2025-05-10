@@ -18,13 +18,17 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
     try {
       await registerUser(email, password);
       toast.success("Registration successful!");
       navigate("/login");
     } catch (err) {
-      toast.error("Registration failed");
+      toast.error(err?.response?.data?.detail || "Registration failed");
     } finally {
       setLoading(false);
     }

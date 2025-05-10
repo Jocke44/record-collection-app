@@ -55,6 +55,13 @@ export default function ResetPassword() {
             required
             disabled={!!location.state?.token}
           />
+          
+          {location.state?.token && (
+            <p className="text-sm text-gray-500">
+              The token was autofilled from the reset link.
+              </p>
+          )}  
+
           <input
             type="password"
             placeholder="New Password"

@@ -3,11 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { loginUser } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function Login() {
-  const { setAuthData } = useAuth();
+  const { login } = useAuth(); // ✅ use login from context
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,8 +23,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await loginUser(email, password);
-      setAuthData(res.data.access_token);
+      await login(email, password); // ✅ use context login directly
       toast.success("Logged in!");
       navigate(location.state?.from || "/collection");
     } catch (err) {
@@ -74,5 +72,6 @@ export default function Login() {
     </div>
   );
 }
+
 
 

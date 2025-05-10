@@ -1,25 +1,22 @@
 // src/pages/HealthCheck.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getRecords } from "@/lib/api";
 
 export default function HealthCheck() {
+  const [apiStatus, setApiStatus] = useState("loading...");
+
   useEffect(() => {
     getRecords()
-      .then(() => {
-        const el = document.getElementById("api-status");
-        if (el) el.textContent = "✅ OK";
-      })
-      .catch(() => {
-        const el = document.getElementById("api-status");
-        if (el) el.textContent = "❌ Error";
-      });
+      .then(() => setApiStatus("✅ OK"))
+      .catch(() => setApiStatus("❌ Error"));
   }, []);
 
   return (
     <div className="text-sm text-muted-foreground">
       <p>Frontend is working ✅</p>
-      <p>Backend reachable: <span id="api-status">loading...</span></p>
+      <p>Backend reachable: <span>{apiStatus}</span></p>
     </div>
   );
 }
+
 

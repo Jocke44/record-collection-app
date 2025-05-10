@@ -1,6 +1,7 @@
 // src/pages/ResetPasswordRequest.jsx
 
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { requestPasswordReset } from "@/lib/api";
 
@@ -43,6 +44,12 @@ export default function ResetPasswordRequest() {
             className="w-full border p-2 rounded bg-white text-black dark:bg-zinc-800 dark:text-white"
             required
           />
+          {location.state?.email && (
+            <p className="text-sm text-gray-500">
+              The email was autofilled from the previous page.
+            </p>
+          )}
+
           <button
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded disabled:opacity-50"

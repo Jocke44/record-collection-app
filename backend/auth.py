@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from models.user import User
 from sqlmodel import Session, select
 from database import get_session, engine 
@@ -21,6 +22,9 @@ RESET_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter()
+
+class ResetRequest(BaseModel):
+    email: str
 
 # --- Password utilities ---
 
@@ -73,6 +77,7 @@ def request_reset(email: str, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.email == email)).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
 
     # generate token
     token = str(uuid.uuid4())
@@ -85,6 +90,7 @@ def request_reset(email: str, session: Session = Depends(get_session)):
     print(f"[DEBUG] Reset link: http://localhost:5173/reset-password?token={token}")
 
     return {"message": "Reset link generated. Check console."}
+
 
 @router.post("/reset-password")
 def reset_password(token: str, new_password: str, session: Session = Depends(get_session)):
