@@ -100,4 +100,4 @@ function MainLayout({ theme, setTheme }) {
 }
 
 
-export default App();
+export default App;
