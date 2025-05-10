@@ -38,7 +38,7 @@ app.include_router(auth.router)
 def on_startup():
     SQLModel.metadata.create_all(engine)
     init_db()
-    add_mock_records()
+    
 
 # --- Collection Endpoints ---
 @app.get("/records", response_model=List[Record])

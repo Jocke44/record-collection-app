@@ -24,17 +24,4 @@ def get_session():
 def init_db():
     SQLModel.metadata.create_all(engine)
 
-def add_mock_records():
-    with Session(engine) as session:
-        if not session.query(Record).first():
-            session.add(Record(
-                title="Kind of Blue",
-                artist="Miles Davis",
-                year=1959,
-                genre="Jazz",
-                format="Vinyl",
-                label="Columbia",
-                cover_url="https://via.placeholder.com/150",
-                notes="Classic album"
-            ))
-            session.commit()
+
