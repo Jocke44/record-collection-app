@@ -4,7 +4,7 @@ print("🔥 Running main.py from backend")
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
-from database import engine, init_db, add_mock_records
+from database import engine, init_db
 from routes import auth
 from models.record import Record
 from dotenv import load_dotenv
