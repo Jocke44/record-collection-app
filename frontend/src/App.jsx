@@ -94,6 +94,8 @@ function MainLayout({ theme, setTheme }) {
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
+        <Route path="/collection" element={<GroupedCollection />} />
+
       </Routes>
     </div>
   );
