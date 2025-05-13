@@ -12,8 +12,7 @@ import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
 import { ProtectedRoute } from "@/lib/ProtectedRoute";
 import ResetPasswordRequest from "./pages/ResetPasswordRequest";
-
-
+import GroupedCollection from "./pages/GroupedCollection";
 
 
 export function App() {
