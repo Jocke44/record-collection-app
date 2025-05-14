@@ -19,9 +19,7 @@ export default function MyCollection() {
   const [selected, setSelected] = useState(null);
   const [notes, setNotes] = useState("");
   const [groupBy, setGroupBy] = useState("artist");
-  const [sortBy, setSortBy] = useState(
-    localStorage.getItem("sortBy") || "title"
-  );
+  const [sortBy, setSortBy] = useState("artist");
   const [lastDeleted, setLastDeleted] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [newRecord, setNewRecord] = useState({
@@ -34,6 +32,13 @@ export default function MyCollection() {
     cover_url: "",
     barcode: "",
   });
+
+  const sortedRecords = [...records].sort((a, b) => {
+  const valA = a[sortBy]?.toString().toLowerCase() ?? "";
+  const valB = b[sortBy]?.toString().toLowerCase() ?? "";
+      return valA.localeCompare(valB, "en", { numeric: true });
+  });
+
 
   const loadRecords = async () => {
     try {
@@ -172,8 +177,8 @@ export default function MyCollection() {
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium">Sort by:</label>
           <Select
-            value={sortBy}
-            onChange={(e) => {
+              value={sortBy}
+              onChange={(e) => {
               setSortBy(e.target.value);
               localStorage.setItem("sortBy", e.target.value);
             }}

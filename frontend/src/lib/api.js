@@ -70,11 +70,20 @@ export const searchDiscogs = async (query) => {
 
 export const addRecord = async (recordData) => {
   try {
-    return await api.post("/records", recordData);
+    const cleanRecord = {
+      ...recordData,
+      artist: recordData.artist?.trim(),
+      title: recordData.title?.trim(),
+      genre: recordData.genre?.trim(),
+      label: recordData.label?.trim(),
+      format: recordData.format?.trim(),
+    };
+    return await api.post("/records", cleanRecord);
   } catch (err) {
     handleError(err);
   }
 };
+;
 
 export const getRecords = async () => {
   try {

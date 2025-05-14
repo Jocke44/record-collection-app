@@ -49,22 +49,46 @@ def get_records():
 @app.post("/records")
 def add_record(record: Record):
     with Session(engine) as session:
+        # Sanitize & normalize fields
+        record.artist = record.artist.strip().title()
+        record.title = record.title.strip()
+        record.genre = record.genre.strip()
+        record.format = record.format.strip()
+        record.label = record.label.strip()
+        
         session.add(record)
         session.commit()
         session.refresh(record)
         return record
+
 
 @app.put("/records/{record_id}")
 def update_record(record_id: int, updated: Record):
     with Session(engine) as session:
         record = session.get(Record, record_id)
         if record:
-            for key, value in updated.dict(exclude_unset=True).items():
+            data = updated.dict(exclude_unset=True)
+
+            if "artist" in data:
+                data["artist"] = data["artist"].strip().title()
+            if "title" in data:
+                data["title"] = data["title"].strip()
+            if "genre" in data:
+                data["genre"] = data["genre"].strip()
+            if "format" in data:
+                data["format"] = data["format"].strip()
+            if "label" in data:
+                data["label"] = data["label"].strip()
+
+            for key, value in data.items():
                 setattr(record, key, value)
+
             session.commit()
             session.refresh(record)
             return record
+
         raise HTTPException(status_code=404, detail="Record not found")
+
 
 @app.delete("/records/{record_id}")
 def delete_record(record_id: int):
