@@ -33,13 +33,6 @@ export default function MyCollection() {
     barcode: "",
   });
 
-  const sortedRecords = [...records].sort((a, b) => {
-  const valA = a[sortBy]?.toString().toLowerCase() ?? "";
-  const valB = b[sortBy]?.toString().toLowerCase() ?? "";
-      return valA.localeCompare(valB, "en", { numeric: true });
-  });
-
-
   const loadRecords = async () => {
     try {
       const res = await getRecords();
