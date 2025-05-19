@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.3",
     "@zxing/browser": "^0.1.5",
     "axios": "^1.6.7",
     "eslint-plugin-react-hooks": "^5.2.0",
