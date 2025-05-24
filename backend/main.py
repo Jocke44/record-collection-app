@@ -53,9 +53,8 @@ def clean_tracklist(data) -> List[str]:
 
 # --- Collection ---
 @app.get("/records", response_model=List[Record])
-def get_records():
-    with Session(engine) as session:
-        return session.exec(select(Record)).all()
+def get_records(session: Session = Depends(get_session)):
+    return session.exec(select(Record)).all()
 
 @app.post("/records")
 def add_record(record: Record, session: Session = Depends(get_session)):
