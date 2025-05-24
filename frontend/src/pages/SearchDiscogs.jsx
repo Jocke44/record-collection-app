@@ -27,14 +27,19 @@ export default function SearchDiscogs() {
   };
 
   const handleAdd = async (item) => {
-    try {
-      await addRecord(item);
-      toast.success("✅ Added to collection!");
-    } catch (err) {
-      console.error("Failed to add", err);
-      toast.error("❌ Failed to add to collection");
-    }
+  const recordData = {
+    title: item.title,
+    artist: item.artist,
+    year: item.year,
+    genre: item.genre,
+    label: item.label,
+    format: item.format,
+    tracklist: item.tracklist?.map(track => track.title) || [], // 🔥 new line
   };
+  await addRecord(recordData);
+  toast.success("Record added!");
+  };
+
 
   return (
     <>

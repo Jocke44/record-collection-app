@@ -3,13 +3,14 @@ print("🔥 Running main.py from backend")
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel
+from fastapi import Depends, HTTPException
+from database import get_session
+from sqlmodel import SQLModel, Session, select
 from database import engine, init_db
 from routes import auth
 from models.record import Record
 from dotenv import load_dotenv
-from typing import List
-from sqlmodel import Session, select
+from typing import List, Union
 import os
 import requests
 
@@ -18,77 +19,91 @@ DISCOGS_TOKEN = os.getenv("DISCOGS_TOKEN")
 
 app = FastAPI()
 
-# --- Middleware ---
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "https://record-frontend.onrender.com"
-    ],
+        "http://localhost:5173",  # Development
+        "https://record-frontend.onrender.com" # Production
+    ],    
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=False,
 )
 
-# --- Routers ---
+
 app.include_router(auth.router)
 
-# --- Startup DB creation ---
 @app.on_event("startup")
 def on_startup():
     SQLModel.metadata.create_all(engine)
     init_db()
-    
 
-# --- Collection Endpoints ---
+# --- Helpers ---
+def clean_string(value: Union[str, None]) -> str:
+    return value.strip() if value else ""
+
+def clean_tracklist(data) -> List[str]:
+    if isinstance(data, list):
+        return [t.strip() for t in data if t.strip()]
+    elif isinstance(data, str):
+        return [t.strip() for t in data.split("\n") if t.strip()]
+    return []
+
+# --- Collection ---
 @app.get("/records", response_model=List[Record])
 def get_records():
     with Session(engine) as session:
         return session.exec(select(Record)).all()
 
 @app.post("/records")
-def add_record(record: Record):
-    with Session(engine) as session:
-        # Sanitize & normalize fields
-        record.artist = record.artist.strip().title()
-        record.title = record.title.strip()
-        record.genre = record.genre.strip()
-        record.format = record.format.strip()
-        record.label = record.label.strip()
-        
+def add_record(record: Record, session: Session = Depends(get_session)):
+    try:
+        record.artist = clean_string(record.artist).title()
+        record.title = clean_string(record.title)
+        record.genre = clean_string(record.genre)
+        record.format = clean_string(record.format)
+        record.label = clean_string(record.label)
+        record.tracklist = clean_tracklist(record.tracklist)
+
         session.add(record)
         session.commit()
         session.refresh(record)
         return record
+    except Exception as e:
+        print("❌ Failed to insert record:", e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.put("/records/{record_id}")
 def update_record(record_id: int, updated: Record):
     with Session(engine) as session:
         record = session.get(Record, record_id)
-        if record:
-            data = updated.dict(exclude_unset=True)
+        if not record:
+            raise HTTPException(status_code=404, detail="Record not found")
 
-            if "artist" in data:
-                data["artist"] = data["artist"].strip().title()
-            if "title" in data:
-                data["title"] = data["title"].strip()
-            if "genre" in data:
-                data["genre"] = data["genre"].strip()
-            if "format" in data:
-                data["format"] = data["format"].strip()
-            if "label" in data:
-                data["label"] = data["label"].strip()
+        data = updated.dict(exclude_unset=True)
 
-            for key, value in data.items():
-                setattr(record, key, value)
+        if "artist" in data:
+            data["artist"] = clean_string(data["artist"]).title()
+        if "title" in data:
+            data["title"] = clean_string(data["title"])
+        if "genre" in data:
+            data["genre"] = clean_string(data["genre"])
+        if "format" in data:
+            data["format"] = clean_string(data["format"])
+        if "label" in data:
+            data["label"] = clean_string(data["label"])
+        if "tracklist" in data:
+            data["tracklist"] = clean_tracklist(data["tracklist"])
 
-            session.commit()
-            session.refresh(record)
-            return record
+        for key, value in data.items():
+            setattr(record, key, value)
 
-        raise HTTPException(status_code=404, detail="Record not found")
-
+        session.commit()
+        session.refresh(record)
+        return record
 
 @app.delete("/records/{record_id}")
 def delete_record(record_id: int):
@@ -103,16 +118,14 @@ def delete_record(record_id: int):
 @app.get("/discogs/search")
 def search_discogs(q: str = None, barcode: str = None):
     url = "https://api.discogs.com/database/search"
-    params = {
-        "token": DISCOGS_TOKEN,
-        "type": "release"
-    }
+    params = {"token": DISCOGS_TOKEN, "type": "release"}
     if barcode:
         params["barcode"] = barcode
     elif q:
         params["q"] = q
     else:
         return {"error": "Provide query or barcode"}
+    
     res = requests.get(url, params=params)
     results = res.json().get("results", [])
     return [{
@@ -125,16 +138,16 @@ def search_discogs(q: str = None, barcode: str = None):
         "label": ", ".join(r.get("label", [])) or "Unknown",
         "cover_url": r.get("cover_image", ""),
         "notes": "",
+        "tracklist": [],
     } for r in results]
 
-# --- Health Check ---
 @app.get("/health")
 def health():
     return {"status": "ok", "message": "Backend is healthy"}
 
-# ✅ Patch: handle both GET + HEAD to keep Render happy
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"message": "Record Collection Backend is live"}
+
 
 

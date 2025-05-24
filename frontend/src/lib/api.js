@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 // 🌎 Change this to your live backend URL
-const BASE_URL = "https://record-backend-a5nk.onrender.com";
+ const BASE_URL = import.meta.env.VITE_API_URL; // "https://record-backend-a5nk.onrender.com";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -102,14 +102,6 @@ export const deleteRecordById = async (id) => {
   }
 };
 
-export const updateRecord = async (id, updated) => {
-  try {
-    return await api.put(`/records/${id}`, updated);
-  } catch (err) {
-    handleError(err);
-  }
-};
-
 export const searchDiscogsByBarcode = async (barcode) => {
   try {
     const res = await api.get(`/discogs/search?barcode=${encodeURIComponent(barcode)}`);
@@ -118,6 +110,22 @@ export const searchDiscogsByBarcode = async (barcode) => {
     handleError(err);
   }
 };
+
+export async function getDiscogsRelease(id) {
+  const res = await fetch(`https://api.discogs.com/releases/${id}?token=${import.meta.env.VITE_DISCOGS_TOKEN}`);
+  return res.json();
+}
+
+export async function updateRecord(id, data) {
+  const res = await fetch(`${BASE_URL}/records/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update record");
+  return await res.json();
+}
+
 
 
 
