@@ -85,14 +85,16 @@ export const addRecord = async (recordData) => {
 };
 ;
 
-export const getRecords = async () => {
+export async function getRecords() {
   try {
-    const res = await api.get("/records");
-    return res.data;
+    const res = await fetch(`${BASE_URL}/records`);
+    if (!res.ok) throw new Error("Failed to fetch records");
+    return await res.json();
   } catch (err) {
-    handleError(err);
+    console.error("API Error:", err);
+    throw err;
   }
-};
+}
 
 export const deleteRecordById = async (id) => {
   try {
