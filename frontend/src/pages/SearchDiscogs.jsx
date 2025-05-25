@@ -17,7 +17,8 @@ export default function SearchDiscogs() {
     setLoading(true);
     try {
       const data = await searchDiscogs(searchTerm);
-      setResults(data);
+      setResults(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) toast.error("Unexpected response format.");
     } catch (error) {
       console.error("Search failed", error);
       toast.error("Failed to fetch search results.");
@@ -27,19 +28,23 @@ export default function SearchDiscogs() {
   };
 
   const handleAdd = async (item) => {
-  const recordData = {
-    title: item.title,
-    artist: item.artist,
-    year: item.year,
-    genre: item.genre,
-    label: item.label,
-    format: item.format,
-    tracklist: item.tracklist?.map(track => track.title) || [], // 🔥 new line
+    try {
+      const recordData = {
+        title: item.title,
+        artist: item.artist,
+        year: item.year,
+        genre: item.genre,
+        label: item.label,
+        format: item.format,
+        tracklist: item.tracklist?.map(track => track.title) || [],
+      };
+      await addRecord(recordData);
+      toast.success("Record added!");
+    } catch (error) {
+      console.error("Add record failed", error);
+      toast.error("Failed to add record to collection.");
+    }
   };
-  await addRecord(recordData);
-  toast.success("Record added!");
-  };
-
 
   return (
     <>
@@ -67,6 +72,10 @@ export default function SearchDiscogs() {
           <div className="flex justify-center my-6">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           </div>
+        )}
+
+        {results.length === 0 && !loading && (
+          <div className="text-center text-muted-foreground mt-6">No results.</div>
         )}
 
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6">
@@ -101,6 +110,3 @@ export default function SearchDiscogs() {
     </>
   );
 }
-
-             
-

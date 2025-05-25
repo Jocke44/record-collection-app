@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { getRecords } from "@/lib/api";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
 import RecordCard from "@/components/RecordCard";
 import RecordModal from "@/components/RecordModal";
 
@@ -13,16 +11,17 @@ export default function MyCollection() {
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-
-
-
   useEffect(() => {
     const fetchRecords = async () => {
       try {
         const res = await getRecords();
-        setRecords(res || []);
+        if (!Array.isArray(res)) {
+          throw new Error("Invalid response from server");
+        }
+        setRecords(res);
       } catch (err) {
         toast.error("Failed to load records");
+        setRecords([]);
       } finally {
         setLoading(false);
       }
@@ -30,18 +29,16 @@ export default function MyCollection() {
     fetchRecords();
   }, []);
 
-  const grouped = records.reduce((acc, rec) => {
-    const key = (rec.artist || "Unknown").trim();
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(rec);
-    return acc;
-  }, {});
+  const grouped = Array.isArray(records)
+    ? records.reduce((acc, rec) => {
+        const key = (rec.artist || "Unknown").trim();
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(rec);
+        return acc;
+      }, {})
+    : {};
 
-  const sortedGrouped = Object.entries(grouped).sort(([a], [b]) =>
-    a.localeCompare(b)
-  );
-
-  
+  const sortedGrouped = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
 
   return (
     <div className="p-4">
@@ -85,9 +82,9 @@ export default function MyCollection() {
               <h2 className="text-xl font-semibold mb-2">{groupName}</h2>
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {sorted.map((record) => (
-                  <RecordCard 
-                    key={record.id} 
-                    record={record} 
+                  <RecordCard
+                    key={record.id}
+                    record={record}
                     onClick={() => setSelectedRecord(record)}
                   />
                 ))}
@@ -96,12 +93,13 @@ export default function MyCollection() {
           );
         })
       )}
+
       {selectedRecord && (
-              <RecordModal
-                record={selectedRecord}
-                onClose={() => setSelectedRecord(null)}
-  />
-)}
+        <RecordModal
+          record={selectedRecord}
+          onClose={() => setSelectedRecord(null)}
+        />
+      )}
     </div>
   );
 }
