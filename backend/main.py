@@ -53,8 +53,14 @@ def clean_tracklist(data) -> List[str]:
 
 # --- Collection ---
 @app.get("/records", response_model=List[Record])
-def get_records(session: Session = Depends(get_session)):
-    return session.exec(select(Record)).all()
+def get_records():
+    try:
+        with Session(engine) as session:
+            return session.exec(select(Record)).all()
+    except Exception as e:
+        print("❌ Error loading records:", e)
+        raise HTTPException(status_code=500, detail="Failed to load records")
+
 
 @app.post("/records")
 def add_record(record: Record, session: Session = Depends(get_session)):
