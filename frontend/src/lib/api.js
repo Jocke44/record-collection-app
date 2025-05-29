@@ -2,12 +2,11 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-// 🌎 Change this to your live backend URL
- const BASE_URL = import.meta.env.VITE_API_URL; // "https://record-backend-a5nk.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // ⏱️ optional timeout
+  timeout: 10000,
 });
 
 const handleError = (error) => {
@@ -68,6 +67,24 @@ export const searchDiscogs = async (query) => {
   }
 };
 
+export const searchDiscogsByBarcode = async (barcode) => {
+  try {
+    const res = await api.get(`/discogs/search?barcode=${encodeURIComponent(barcode)}`);
+    return res.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const getRecords = async () => {
+  try {
+    const res = await api.get("/records");
+    return res.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
+
 export const addRecord = async (recordData) => {
   try {
     const cleanRecord = {
@@ -83,18 +100,6 @@ export const addRecord = async (recordData) => {
     handleError(err);
   }
 };
-;
-
-export async function getRecords() {
-  try {
-    const res = await fetch(`${BASE_URL}/records`);
-    if (!res.ok) throw new Error("Failed to fetch records");
-    return await res.json();
-  } catch (err) {
-    console.error("API Error:", err);
-    throw err;
-  }
-}
 
 export const deleteRecordById = async (id) => {
   try {
@@ -104,33 +109,22 @@ export const deleteRecordById = async (id) => {
   }
 };
 
-export const searchDiscogsByBarcode = async (barcode) => {
+export const updateRecord = async (id, data) => {
   try {
-    const res = await api.get(`/discogs/search?barcode=${encodeURIComponent(barcode)}`);
+    const res = await api.put(`/records/${id}`, data);
     return res.data;
   } catch (err) {
     handleError(err);
   }
 };
 
-export async function getDiscogsRelease(id) {
-  const res = await fetch(`https://api.discogs.com/releases/${id}?token=${import.meta.env.VITE_DISCOGS_TOKEN}`);
-  return res.json();
-}
-
-export async function updateRecord(id, data) {
-  const res = await fetch(`${BASE_URL}/records/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Failed to update record");
-  return await res.json();
-}
-
-
-
-
-
-// ✅ Add more endpoints as needed (export const xyz...)
-
+export const getDiscogsRelease = async (id) => {
+  try {
+    const res = await fetch(`https://api.discogs.com/releases/${id}?token=${import.meta.env.VITE_DISCOGS_TOKEN}`);
+    return await res.json();
+  } catch (err) {
+    console.error("Discogs API Error:", err);
+    toast.error("Failed to fetch release info.");
+    return null;
+  }
+};
