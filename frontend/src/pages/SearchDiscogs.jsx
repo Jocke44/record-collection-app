@@ -36,6 +36,7 @@ export default function SearchDiscogs() {
         genre: item.genre,
         label: item.label,
         format: item.format,
+        image_url: item.cover_url || item.thumb || null,
         tracklist: item.tracklist?.map(track => track.title) || [],
       };
       await addRecord(recordData);
